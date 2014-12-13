@@ -37,7 +37,7 @@ Using the **IPython Notebook environment** (cf. http://ipython.org) you are able
 
 ## Python Prerequisites
 
-If you do not have already installed a current Python interpreter (2.7.x) with the most important data analytics libries (mainly NumPy, pandas, PyTables/HDF5, matplotlib are needed), it is easiest to install the **Anaconda Python distribution** which is free and available for all main operating systems (Linux, Windows, Mac OS). You can download it under http://continuum.io/downloads.
+If you do not have already installed a current Python interpreter (2.7.x) with the most important data analytics libraries (mainly NumPy, pandas, PyTables/HDF5, matplotlib are needed), it is easiest to install the **Anaconda Python distribution** which is free and available for all main operating systems (Linux, Windows, Mac OS). You can download it under http://continuum.io/downloads.
 
 ## Help and Support
 
