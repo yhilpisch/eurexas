@@ -7,26 +7,29 @@
 #
 # (c) The Python Quants GmbH
 # For illustration purposes only.
-# December 2014
+# December 2014 (update 10.03.2016)
 #
 from urllib2 import *
 import datetime as dt
 import pandas as pd
 import numpy as np
+import requests
 from StringIO import *
 from index_date_functions import *
 
 #
 # The URL template
 #
-u1 = 'http://www.eurexchange.com/exchange-en/market-data/statistics/'
-u2 = 'market-statistics-online/180102!onlineStats?productGroupId=846'
-u3 = '&productId=19068&viewType=3&cp=%s&month=%s&year=%s&busDate=%s'
-URL = u1 + u2 + u3
+url1 = 'http://www.eurexchange.com/action/exchange-en/'
+url2 = '180106-180102/180102/onlineStats.do?productGroupId=846'
+url3 = '&productId=19068&viewType=3&cp=%s&month=%s&year=%s&busDate=%s'
+URL = url1 + url2 + url3
 
 #
 # Functions for data collection, parsing and pre-processing
 #
+
+
 def collect_option_series(month, year, start):
     ''' Collects daily option data from Web source.
 
@@ -49,7 +52,6 @@ def collect_option_series(month, year, start):
                 dataset = dummy
             else:
                 dataset = pd.concat((dataset, dummy))  # add data
-
 
     return dataset
 
@@ -96,11 +98,8 @@ def get_data_from_www(oType, matMonth, matYear, date):
         expiry in the format 'YYYYMM'
     '''
 
-    url = URL % (oType, matMonth, matYear, date)  # parameterizes the URLS
-    req = Request(url)
-    con = urlopen(req)  # establishes connection to URL
-    a = con.read()  # reads answer
-    con.close()
+    url = URL % (oType, matMonth, matYear, date)  # parametrizes the URL
+    a = requests.get(url).text
     return a
 
 
@@ -135,8 +134,8 @@ def parse_data(data, date):
     '''
     parts = data.split("<table")
     parts2 = parts[1].split("</table")
-    dummy = parts2[0].replace(' class="odd"','')
-    dummy = dummy.replace(' class="even"','')
+    dummy = parts2[0].replace(' class="odd"', '')
+    dummy = dummy.replace(' class="even"', '')
     parts3 = dummy.split("<tr><td><b>Total</b>")
     table = parts3[0]   # the html table containing the data
     table = table.replace('class="dataTable"><thead>', 'Pricing day')
@@ -155,8 +154,7 @@ def parse_data(data, date):
 
     string = StringIO(table)  # mask the string as file
     dataset = pd.read_csv(string, parse_dates=[0], index_col=(0, 1),
-                dayfirst=True)  # read the 'file' as pandas object
-
+                          dayfirst=True)  # read the 'file' as pandas object
 
     return dataset
 
@@ -196,7 +194,7 @@ def data_collection(path):
 
             if len(index_new - index_old) > 0:
                 dummy = pd.concat((store[series_name],
-                     dataset.ix[index_new - index_old]))  # add the new data
+                                   dataset.ix[index_new - index_old]))  # add the new data
 
                 #dummy = dummy.reset_index()
                 #dummy = dummy.set_index([" Pricing day", "Strike price"])
@@ -207,4 +205,3 @@ def data_collection(path):
                 store[series_name] = dataset
 
     store.close()
-
